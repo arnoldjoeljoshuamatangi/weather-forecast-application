@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: weather-forecast-application
+  cache:
+    type: caffeine
+    cache-names:
+      - weatherData
+      - geocodingData
+
+server:
+  port: ${PORT:8080}
+
+app:
+  weather:
+    provider: open-meteo
+    cache-ttl-minutes: 15
+
+# Springdoc OpenAPI Swagger
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+

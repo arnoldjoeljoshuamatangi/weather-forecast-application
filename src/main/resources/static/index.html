@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyPulse | Real-Time Weather Forecast & Radar</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="theme-day">
+
+    <!-- Background Atmospheric Glow -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="brand">
+                <i class="fa-solid fa-cloud-bolt brand-icon"></i>
+                <span class="brand-title">Sky<span>Pulse</span></span>
+            </div>
+            <div class="nav-actions">
+                <button id="locationBtn" class="btn-pill" title="Use current GPS location">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                    <span>Locate Me</span>
+                </button>
+                <div class="unit-toggle">
+                    <button id="unitMetric" class="unit-btn active">°C</button>
+                    <button id="unitImperial" class="unit-btn">°F</button>
+                </div>
+                <a href="/swagger-ui.html" target="_blank" class="nav-link">
+                    <i class="fa-solid fa-book-open"></i> API Docs
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-box-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="citySearchInput" placeholder="Search city or country (e.g. Tokyo, London, New York)..." autocomplete="off">
+                <button id="searchBtn" class="btn-search">Search</button>
+                <!-- Autocomplete Dropdown -->
+                <div id="autocompleteDropdown" class="autocomplete-dropdown hidden"></div>
+            </div>
+
+            <!-- Quick City Tags -->
+            <div class="quick-cities">
+                <span class="quick-label">Trending:</span>
+                <button class="city-tag" data-city="London">London</button>
+                <button class="city-tag" data-city="New York">New York</button>
+                <button class="city-tag" data-city="Tokyo">Tokyo</button>
+                <button class="city-tag" data-city="Paris">Paris</button>
+                <button class="city-tag" data-city="Sydney">Sydney</button>
+                <button class="city-tag" data-city="Mumbai">Mumbai</button>
+                <button class="city-tag" data-city="Dubai">Dubai</button>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <div id="loadingIndicator" class="loading-state hidden">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+            <p>Fetching real-time atmospheric data...</p>
+        </div>
+
+        <!-- Main Dashboard View -->
+        <div id="weatherDashboard" class="weather-dashboard">
+            <!-- Hero Card: Current Weather -->
+            <section class="current-weather-card">
+                <div class="current-header">
+                    <div>
+                        <div class="city-badge">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <h1 id="cityName">London</h1>
+                            <span id="countryCode" class="country-badge">GB</span>
+                        </div>
+                        <p id="currentDateTime" class="current-datetime">Monday, 12:00 PM</p>
+                    </div>
+                    <div class="weather-condition-badge">
+                        <i id="conditionIcon" class="fa-solid fa-cloud-sun condition-icon"></i>
+                        <span id="conditionText">Partly Cloudy</span>
+                    </div>
+                </div>
+
+                <div class="current-body">
+                    <div class="temp-large-display">
+                        <span id="currentTemp" class="temp-val">22</span>
+                        <span class="temp-unit" id="tempUnitDisplay">°C</span>
+                    </div>
+                    <div class="feels-like-box">
+                        <span>Feels like <strong id="feelsLikeTemp">23°C</strong></span>
+                    </div>
+                </div>
+
+                <!-- Weather Vital Cards Grid -->
+                <div class="vitals-grid">
+                    <div class="vital-card">
+                        <div class="vital-icon humidity"><i class="fa-solid fa-droplet"></i></div>
+                        <div class="vital-info">
+                            <span class="vital-label">Humidity</span>
+                            <strong id="humidityVal" class="vital-value">65%</strong>
+                        </div>
+                    </div>
+                    <div class="vital-card">
+                        <div class="vital-icon wind"><i class="fa-solid fa-wind"></i></div>
+                        <div class="vital-info">
+                            <span class="vital-label">Wind Speed</span>
+                            <strong id="windSpeedVal" class="vital-value">14.2 km/h</strong>
+                        </div>
+                    </div>
+                    <div class="vital-card">
+                        <div class="vital-icon pressure"><i class="fa-solid fa-gauge-high"></i></div>
+                        <div class="vital-info">
+                            <span class="vital-label">Air Pressure</span>
+                            <strong id="pressureVal" class="vital-value">1014 hPa</strong>
+                        </div>
+                    </div>
+                    <div class="vital-card">
+                        <div class="vital-icon uv"><i class="fa-solid fa-sun"></i></div>
+                        <div class="vital-info">
+                            <span class="vital-label">UV Index</span>
+                            <strong id="uvVal" class="vital-value">5.0 (Moderate)</strong>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 24-Hour Hourly Timeline -->
+            <section class="section-card">
+                <div class="section-header">
+                    <h3><i class="fa-solid fa-clock"></i> 24-Hour Forecast Timeline</h3>
+                </div>
+                <div class="hourly-slider" id="hourlyContainer">
+                    <!-- Hourly items dynamically injected -->
+                </div>
+            </section>
+
+            <!-- 5-Day Extended Forecast -->
+            <section class="section-card">
+                <div class="section-header">
+                    <h3><i class="fa-solid fa-calendar-week"></i> 5-Day Extended Weather Forecast</h3>
+                </div>
+                <div class="forecast-grid" id="forecastContainer">
+                    <!-- 5-day forecast cards dynamically injected -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
+
